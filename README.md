@@ -37,7 +37,7 @@ sudo apt install libeigen3-dev
 ```
 and then create a symlink so that ORB_SLAM3 can find it:
 ```bash
-sudo ln -s /usr/include/eigen3/Eigen/ /usr/include/Eigen/
+sudo ln -s /usr/include/eigen3/Eigen/ /usr/include/Eigen
 ```
 
 Next, cd into the ORB_SLAM3 directory and run the ```build.sh``` script. Make sure the
