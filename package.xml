@@ -2,29 +2,37 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>orb_slam3_ros2</name>
-  <version>0.0.0</version>
-  <description>ORB_SLAM3 in ROS2 Humble</description>
+  <version>1.0.0</version>
+  <description>ORB_SLAM3 in ROS2 Jazzy</description>
   <maintainer email="gclifford@u.northwestern.edu">Graham Clifford</maintainer>
-  <license>TODO: License declaration</license>
+  <license>BSD3</license>
 
-  <depend>rclcpp</depend>
-  <depend>std_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>tf2</depend>
-  <depend>tf2_ros</depend>
-  <depend>octomap_server</depend>
-  <depend>nav_msgs</depend>
-  <depend>apriltag</depend>
-  <depend>apriltag_ros</depend>
-  <depend>apriltag_msgs</depend>
-  <depend>cv_bridge</depend>
-  <depend>image_transport</depend>
-  <depend>pcl_ros</depend>
-  <depend>pcl_conversions</depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
 
-  <depend>rclpy</depend>
+  <depend>rclcpp</depend>
+  <exec_depend>rclpy</exec_depend>
+
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>nav_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>realsense2_description</depend>
+  <depend>xacro</depend>
+  <depend>sophus</depend>
+  <depend>pangolin</depend>
+  <depend>pcl_ros</depend>
+  <depend>pcl_conversions</depend>
+  <depend>libpcl-all-dev</depend>
+  <depend>libopencv-dev</depend>
+  <depend>yaml-cpp</depend>
+  <depend>nav2_map_server</depend>
+  <!-- <depend>image_transport</depend> -->
+
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -1,16 +1,15 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 project(orb_slam3_ros2)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(ENV{PYTHONPATH} "/opt/ros/humble/lib/python3.10/site-packages/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
-if(NOT CMAKE_BUILD_TYPE)        # If no build type is set, set one
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Type of build." FORCE)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Type of build." FORCE)
 endif()
 
 if(NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -20,9 +19,6 @@ endif()
 set(ENV{PROJECT_PATH} "${PROJECT_SOURCE_DIR}")
 add_definitions(-DPROJECT_PATH="${PROJECT_SOURCE_DIR}")
 add_definitions(${PCL_DEFINITIONS})
-
-set(USER_HOME $ENV{HOME})
-# set(CMAKE_PREFIX_PATH "${USER_HOME}/.local/include/libpointmatcher/share/libpointmatcher/cmake;${CMAKE_PREFIX_PATH}")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -43,11 +39,9 @@ find_package(Sophus REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
-find_package(PCL 1.12 REQUIRED)
+find_package(PCL 1.14 REQUIRED)
 find_package(OpenCV REQUIRED)
 
-# find_package(RTABMap REQUIRED)
-# find_package(imu_filter_madgwick REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(nav2_map_server REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)

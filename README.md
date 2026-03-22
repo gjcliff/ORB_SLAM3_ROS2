@@ -8,7 +8,29 @@ you look at other repositories.
 This project is only set up for monocular and imu-monocular modes in orb_slam3
 at the moment.
 
-### Building the project
+### Building
+
+follow the instructions here:
+https://github.com/realsenseai/librealsense/blob/master/doc/distribution_linux.md
+
+and install:
+- librealsense2-dkms 
+- librealsense2-utils
+- librealsense2-dev
+
+```bash
+sudo apt install librealsense2-dkms librealsense2-utils librealsense2-dev
+```
+
+then use rosdep to install dependencies:
+```bash
+sudo rosdep init
+rosdep update
+# run from ws
+rosdep install --from-paths src -y --ignore-src
+# or
+# rosdep install --from-paths src/<pkg-name> -y --ignore-src
+```
 
 #### Setting up your workspace
 The first thing I will do is explain how I set up my ROS 2 workspace for this project.
