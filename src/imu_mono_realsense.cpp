@@ -100,8 +100,6 @@ public:
     // create publishers
     live_point_cloud_publisher_ =
       create_publisher<sensor_msgs::msg::PointCloud2>("live_point_cloud", 10);
-    pose_array_publisher_ =
-      create_publisher<geometry_msgs::msg::PoseArray>("pose_array", 10);
     live_occupancy_grid_publisher_ =
       create_publisher<nav_msgs::msg::OccupancyGrid>("live_occupancy_grid", 10);
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("orb_odom", 10);
@@ -395,25 +393,6 @@ private:
       rclcpp::Time time_now = get_clock()->now();
       auto Twc = Tcw_.inverse();
 
-      tf2::Quaternion q_orig(
-        Twc.unit_quaternion().x(), Twc.unit_quaternion().y(),
-        Twc.unit_quaternion().z(), Twc.unit_quaternion().w());
-
-      tf2::Matrix3x3 m(q_orig);
-      double roll, pitch, yaw;
-      m.getRPY(roll, pitch, yaw);
-
-      tf2::Quaternion q_yaw;
-      q_yaw.setRPY(0, 0, yaw);
-
-      tf2::Quaternion q_rot_x, q_rot_z;
-      // q_rot_x.setRPY(M_PI / 2.0, 0, 0);
-      q_rot_z.setRPY(0, 0, M_PI / 2.0);
-
-      // change camera coordinate to map coordinates
-      tf2::Quaternion q_combined = q_rot_z * q_yaw;
-      q_combined.normalize();
-
       geometry_msgs::msg::TransformStamped odom_tf;
       odom_tf.header.stamp = time_now;
       odom_tf.header.frame_id = "odom";
@@ -440,30 +419,6 @@ private:
       odom.pose.pose.orientation.w = Twc.unit_quaternion().w();
       odom_publisher_->publish(odom);
 
-      geometry_msgs::msg::Pose pose;
-      pose.position.x = Twc.translation().x();
-      pose.position.y = Twc.translation().y();
-      // pose.position.z = Twc.translation().z();
-      pose.orientation.x = q_combined.x();
-      pose.orientation.y = q_combined.y();
-      pose.orientation.z = q_combined.z();
-      pose.orientation.w = q_combined.w();
-      pose_array_.header.stamp = time_now;
-      pose_array_.poses.push_back(pose);
-      pose_array_publisher_->publish(pose_array_);
-
-      // geometry_msgs::msg::TransformStamped base_link_tf;
-      // base_link_tf.header.stamp = time_now;
-      // base_link_tf.header.frame_id = "live_map";
-      // base_link_tf.child_frame_id = "base_link";
-      // base_link_tf.transform.translation.x = Twc.translation().x();
-      // base_link_tf.transform.translation.y = Twc.translation().y();
-      // base_link_tf.transform.rotation.x = q_combined.x();
-      // base_link_tf.transform.rotation.y = q_combined.y();
-      // base_link_tf.transform.rotation.z = q_combined.z();
-      // base_link_tf.transform.rotation.w = q_combined.w();
-      // tf_broadcaster->sendTransform(base_link_tf);
-
       geometry_msgs::msg::TransformStamped point_cloud_tf;
       point_cloud_tf.header.stamp = time_now;
       point_cloud_tf.header.frame_id = "map";
@@ -476,7 +431,7 @@ private:
       live_map_tf.child_frame_id = "live_map";
       tf_broadcaster->sendTransform(live_map_tf);
 
-      // live_pcl_cloud_ = orb_slam3_system_->GetMapPCL();
+      live_pcl_cloud_ = orb_slam3_system_->GetMapPCL();
 
       // pcl::PointCloud<pcl::PointXYZ>::Ptr live_ptr =
       //   std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(live_pcl_cloud_);
@@ -519,8 +474,6 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr
     live_point_cloud_publisher_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr
-    pose_array_publisher_;
   rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr
     live_occupancy_grid_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
