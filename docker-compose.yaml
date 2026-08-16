@@ -1,6 +1,19 @@
 include: [./ros2_realsense_d435i_camera_calibration/docker-compose.yaml]
 services:
 
+  orb_slam3:
+    extends:
+      service: base
+    image: "orb_slam3:latest"
+    command: >
+      bash -c "
+      source /opt/ros/jazzy/setup.bash &&
+      colcon build &&
+      source install/setup.bash &&
+      ros2 launch orb_slam3_ros2 mapping.launch.py
+      "
+
+
   base:
     build: 
       context: .

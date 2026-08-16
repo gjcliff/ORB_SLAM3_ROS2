@@ -3,10 +3,11 @@ from datetime import datetime
 from launch.actions import (
     DeclareLaunchArgument,
     ExecuteProcess,
-    IncludeLaunchDescription,
+    # IncludeLaunchDescription,
 )
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+# from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     Command,
     LaunchConfiguration,
@@ -30,7 +31,7 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "use_rviz",
-                default_value="true",
+                default_value="false",
                 description="Whether to launch RViz.",
             ),
             DeclareLaunchArgument(

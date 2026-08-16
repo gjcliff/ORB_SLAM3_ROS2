@@ -116,14 +116,14 @@ public:
     image_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
     image_qos.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
     image_sub = create_subscription<sensor_msgs::msg::Image>(
-      "camera/camera/color/image_raw", image_qos,
+      "camera/infra1/image_rect_raw", image_qos,
       std::bind(&ImuMonoRealSense::image_callback, this, _1), image_options);
 
     rclcpp::QoS imu_qos(rclcpp::KeepLast(10));
     imu_qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
     imu_qos.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
     imu_sub = create_subscription<sensor_msgs::msg::Imu>(
-      "camera/camera/imu", imu_qos,
+      "camera/imu", imu_qos,
       std::bind(&ImuMonoRealSense::imu_callback, this, _1), imu_options);
 
     // tf broadcaster
@@ -311,12 +311,13 @@ private:
   void image_callback(const sensor_msgs::msg::Image::SharedPtr msg)
   {
     rclcpp::Time time_now = get_clock()->now();
+    RCLCPP_INFO_STREAM(get_logger(), "got image");
 
-    sensor_msgs::msg::Image::SharedPtr msg_out =
-      std::make_shared<sensor_msgs::msg::Image>(*msg);
-    msg_out->header.stamp = time_now;
-    msg_out->header.frame_id = "base_link";
-    orb_image_publisher_->publish(*msg_out);
+    // sensor_msgs::msg::Image::SharedPtr msg_out =
+    //   std::make_shared<sensor_msgs::msg::Image>(*msg);
+    // msg_out->header.stamp = time_now;
+    // msg_out->header.frame_id = "base_link";
+    // orb_image_publisher_->publish(*msg_out);
 
     img_buf_.push(msg);
 

@@ -1,12 +1,12 @@
-from launch import LaunchDescription
-from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
 )
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-from launch.actions import DeclareLaunchArgument
+from launch import LaunchDescription
 
 
 def generate_launch_description():
@@ -24,9 +24,7 @@ def generate_launch_description():
                 # prefix="xterm -e gdb --args",
                 parameters=[
                     {
-                        "output_name": LaunchConfiguration(
-                            "output_name"
-                        ),
+                        "output_name": LaunchConfiguration("output_name"),
                     }
                 ],
             ),
