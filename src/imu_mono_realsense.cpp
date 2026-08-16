@@ -106,23 +106,18 @@ public:
       create_publisher<nav_msgs::msg::OccupancyGrid>("live_occupancy_grid", 10);
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("orb_odom", 10);
     orb_image_publisher_ =
-      create_publisher<sensor_msgs::msg::Image>("/orb_camera/image", 10);
-    imu_publisher_ =
-      create_publisher<sensor_msgs::msg::Imu>("/orb_camera/imu", 10);
+      create_publisher<sensor_msgs::msg::Image>("/camera/pretty", 10);
 
     // create subscriptions
-    rclcpp::QoS image_qos(rclcpp::KeepLast(10));
-    image_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
-    image_qos.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
+    rclcpp::QoS sensor_qos(
+      rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data),
+      rmw_qos_profile_sensor_data);
     image_sub = create_subscription<sensor_msgs::msg::Image>(
-      "camera/infra1/image_rect_raw", image_qos,
+      "camera/infra1/image_rect_raw", sensor_qos,
       std::bind(&ImuMonoRealSense::image_callback, this, _1), image_options);
 
-    rclcpp::QoS imu_qos(rclcpp::KeepLast(10));
-    imu_qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
-    imu_qos.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
     imu_sub = create_subscription<sensor_msgs::msg::Imu>(
-      "camera/imu", imu_qos,
+      "camera/imu", sensor_qos,
       std::bind(&ImuMonoRealSense::imu_callback, this, _1), imu_options);
 
     // tf broadcaster
@@ -140,18 +135,18 @@ public:
       std::cout << "Failed to create output directory" << std::endl;
       return;
     }
-    if (!std::filesystem::create_directory(path + "/cloud")) {
-      std::cout << "Failed to create cloud directory" << std::endl;
-      return;
-    }
-    if (!std::filesystem::create_directory(path + "/grid")) {
-      std::cout << "Failed to create grid directory" << std::endl;
-      return;
-    }
-    if (!std::filesystem::create_directory(path + "/video")) {
-      std::cout << "Failed to create images directory" << std::endl;
-      return;
-    }
+    // if (!std::filesystem::create_directory(path + "/cloud")) {
+    //   std::cout << "Failed to create cloud directory" << std::endl;
+    //   return;
+    // }
+    // if (!std::filesystem::create_directory(path + "/grid")) {
+    //   std::cout << "Failed to create grid directory" << std::endl;
+    //   return;
+    // }
+    // if (!std::filesystem::create_directory(path + "/video")) {
+    //   std::cout << "Failed to create images directory" << std::endl;
+    //   return;
+    // }
 
     rclcpp::on_shutdown([this]() {
       video_writer_.release();
@@ -311,12 +306,6 @@ private:
   {
     rclcpp::Time time_now = get_clock()->now();
 
-    // sensor_msgs::msg::Image::SharedPtr msg_out =
-    //   std::make_shared<sensor_msgs::msg::Image>(*msg);
-    // msg_out->header.stamp = time_now;
-    // msg_out->header.frame_id = "base_link";
-    // orb_image_publisher_->publish(*msg_out);
-
     img_buf_.push(msg);
 
     // begin to empty the img_buf_ queue, which is full of other queues
@@ -350,28 +339,24 @@ private:
       buf_mutex_imu_.unlock();
 
       if (vImuMeas.empty() && sensor_type_param == "imu-monocular") {
-        // RCLCPP_WARN(get_logger(),
-        //             "No valid IMU data available for the current frame "
-        //             "at time %.6f.",
-        //             tImage);
+        RCLCPP_WARN(get_logger(),
+                    "No valid IMU data available for the current frame "
+                    "at time %.6f.",
+                    tImage);
         return;
       }
 
       try {
         if (sensor_type_param == "monocular") {
-          auto Tcw = orb_slam3_system_->TrackMonocular(imageFrame, tImage);
-          Tcw_.translation() = Tcw.translation();
-          Tcw_.setQuaternion(Tcw.unit_quaternion());
+          Tcw_ = orb_slam3_system_->TrackMonocular(imageFrame, tImage);
         } else {
           if (vImuMeas.size() > 1) {
-            auto Tcw =
+            Tcw_ =
               orb_slam3_system_->TrackMonocular(imageFrame, tImage, vImuMeas);
-            Tcw_.translation() = Tcw.translation();
-            Tcw_.setQuaternion(Tcw.unit_quaternion());
           }
         }
-        // cv::Mat pretty_frame = orb_slam3_system_->getPrettyFrame();
-        // video_writer_.write(pretty_frame);
+        cv::Mat pretty_frame = orb_slam3_system_->GetFrameDrawerImage();
+        video_writer_.write(pretty_frame);
 
       } catch (const std::exception &e) {
         RCLCPP_ERROR(get_logger(), "SLAM processing exception: %s", e.what());
