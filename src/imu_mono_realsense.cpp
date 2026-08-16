@@ -31,11 +31,10 @@
 
 #include "nav2_map_server/map_io.hpp"
 
-#include <chrono>
 #include <filesystem>
 #include <sstream>
 
-#include <cv_bridge/cv_bridge.h>
+#include <cv_bridge/cv_bridge.hpp>
 
 // this is orb_slam3
 #include "System.h"
@@ -43,7 +42,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 using namespace std::chrono_literals;
-using std::placeholders::_1, std::placeholders::_2;
+using std::placeholders::_1;
 
 class ImuMonoRealSense : public rclcpp::Node {
 public:
@@ -372,8 +371,8 @@ private:
             Tcw_.setQuaternion(Tcw.unit_quaternion());
           }
         }
-        cv::Mat pretty_frame = orb_slam3_system_->getPrettyFrame();
-        video_writer_.write(pretty_frame);
+        // cv::Mat pretty_frame = orb_slam3_system_->getPrettyFrame();
+        // video_writer_.write(pretty_frame);
 
       } catch (const std::exception &e) {
         RCLCPP_ERROR(get_logger(), "SLAM processing exception: %s", e.what());
@@ -408,7 +407,7 @@ private:
     unique_lock<mutex> lock(orbslam3_mutex_);
 
     geometry_msgs::msg::Pose pose;
-    if (orb_slam3_system_->isImuInitialized()) {
+    if (!orb_slam3_system_->isShutDown()) {
       rclcpp::Time time_now = get_clock()->now();
       auto Twc = Tcw_.inverse();
 
@@ -506,7 +505,8 @@ private:
       pcl::toROSMsg(*filtered_cloud_ptr, live_pcl_cloud_msg_);
 
       // this can go
-      // live_occupancy_grid_ = point_cloud_to_occupancy_grid(filtered_cloud_ptr);
+      // live_occupancy_grid_ =
+      // point_cloud_to_occupancy_grid(filtered_cloud_ptr);
       // live_occupancy_grid_->header.stamp = time_now;
       // live_occupancy_grid_->header.frame_id = "live_map";
       // live_occupancy_grid_publisher_->publish(*live_occupancy_grid_);
@@ -518,17 +518,17 @@ private:
       // RCLCPP_INFO_STREAM(get_logger(), "IMU not initialized");
       initialize_variables();
     }
-    if (!inertial_ba1_ && orb_slam3_system_->GetInertialBA1()) {
-      inertial_ba1_ = true;
-      initialize_variables();
-      RCLCPP_INFO(get_logger(), "Inertial BA1 complete");
-    }
-
-    if (!inertial_ba2_ && orb_slam3_system_->GetInertialBA2()) {
-      inertial_ba2_ = true;
-      initialize_variables();
-      RCLCPP_INFO(get_logger(), "Inertial BA2 complete");
-    }
+    // if (!inertial_ba1_ && orb_slam3_system_->GetInertialBA1()) {
+    //   inertial_ba1_ = true;
+    //   initialize_variables();
+    //   RCLCPP_INFO(get_logger(), "Inertial BA1 complete");
+    // }
+    //
+    // if (!inertial_ba2_ && orb_slam3_system_->GetInertialBA2()) {
+    //   inertial_ba2_ = true;
+    //   initialize_variables();
+    //   RCLCPP_INFO(get_logger(), "Inertial BA2 complete");
+    // }
   }
 
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub;

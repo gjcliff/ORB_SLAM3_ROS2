@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     pybind11-dev \
     python3-pip \
     libyaml-cpp-dev \
-    ros-${ROS_DISTRO}-navigation2 \
+    ros-${ROS_DISTRO}-nav2-map-server \
     ros-${ROS_DISTRO}-pcl-ros \
     ros-${ROS_DISTRO}-pcl-conversions \
     ros-${ROS_DISTRO}-pangolin \

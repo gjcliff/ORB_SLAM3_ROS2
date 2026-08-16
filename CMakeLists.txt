@@ -44,11 +44,16 @@ find_package(OpenCV REQUIRED)
 
 find_package(yaml-cpp REQUIRED)
 find_package(nav2_map_server REQUIRED)
-find_package(ORB_SLAM3 REQUIRED)
+
+set(ORB_SLAM3_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ORB_SLAM3)
+find_package(ORB_SLAM3 REQUIRED CONFIG
+    PATHS ${ORB_SLAM3_ROOT_DIR}/build
+    NO_DEFAULT_PATH
+)
 find_package(realsense2)
 
-if(ORB_SLAM3_LIBRARY)
-    message("Found ORB_SLAM3: ${ORB_SLAM3_LIBRARY}")
+if(TARGET ORB_SLAM3::ORB_SLAM3)
+    message("Found ORB_SLAM3::ORB_SLAM3")
 else()
     message("Could not find ORB_SLAM3 library")
 endif()
@@ -71,7 +76,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   # imu_filter_madgwick
   yaml-cpp
   nav2_map_server
-  ORB_SLAM3
 )
 
 add_executable(imu_mono_node_cpp
@@ -106,9 +110,8 @@ ament_target_dependencies(orb_alt
   PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
-set(ORB_SLAM3_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ORB_SLAM3)
-
 include_directories(
+    ${ORB_SLAM3_ROOT_DIR}
     ${ORB_SLAM3_ROOT_DIR}/include
     ${ORB_SLAM3_ROOT_DIR}/include/CameraModels
     ${ORB_SLAM3_ROOT_DIR}/Thirdparty/Sophus
@@ -117,25 +120,22 @@ include_directories(
 )
 
 target_include_directories(imu_mono_node_cpp PUBLIC
-    ${ORB_SLAM3_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
 )
 
-target_link_libraries(imu_mono_node_cpp PUBLIC ${ORB_SLAM3_LIBRARY} ${PCL_LIBRARIES}
-    ${libpointmatcher_LIBRARIES} ${libpointmatcher_ros_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries(orb_camera_info_node PUBLIC yaml-cpp)
-target_link_libraries(orb_camera_info_node PUBLIC ${PCL_LIBRARIES})
-target_link_libraries(orb_alt PUBLIC ${ORB_SLAM3_LIBRARY} ${PCL_LIBRARIES} ${OpenCV_LIBS}
-    ${realsense2_LIBRARY})
+target_link_libraries(imu_mono_node_cpp PUBLIC ORB_SLAM3::ORB_SLAM3 ${PCL_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
+target_link_libraries(orb_camera_info_node PUBLIC yaml-cpp ${PCL_LIBRARIES})
+target_link_libraries(orb_alt PUBLIC ORB_SLAM3::ORB_SLAM3 ${PCL_LIBRARIES} ${OpenCV_LIBS} ${realsense2_LIBRARY} yaml-cpp)
 
 install(TARGETS imu_mono_node_cpp orb_camera_info_node visualize_node orb_alt
     DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY ${ORB_SLAM3_INCLUDE_DIR}
+install(DIRECTORY ${ORB_SLAM3_ROOT_DIR}/include
         DESTINATION include
 )
 
-install(FILES ${ORB_SLAM3_LIBRARY}
+install(FILES ${ORB_SLAM3_ROOT_DIR}/lib/libORB_SLAM3.so
         DESTINATION lib
 )
 
@@ -145,12 +145,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/g2o/lib/libg2o.so
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/DBoW2/lib/libDBoW2.so
         DESTINATION lib
-)
-
-# install bag files
-install(
-  DIRECTORY bags/
-  DESTINATION share/${PROJECT_NAME}/bags
 )
 
 # install config files

@@ -34,19 +34,8 @@ def generate_launch_description():
                 description="Whether to launch RViz.",
             ),
             DeclareLaunchArgument(
-                "ip_address",
-                default_value="172.17.0.3",
-                description="The IP address of the luci docker container",
-            ),
-            DeclareLaunchArgument(
-                "remote_launch",
-                default_value="false",
-                description="Whether or not to launch the luci launch file on\
-                        the docker container",
-            ),
-            DeclareLaunchArgument(
                 "sensor_type",
-                default_value="imu-monocular",
+                default_value="monocular",
                 description="The mode which ORB_SLAM3 will run in.",
             ),
             DeclareLaunchArgument(
@@ -73,36 +62,36 @@ def generate_launch_description():
                         default, the name of the bag will be\
                         ORB_SLAM3_YYYY-MM-DD_HH-mm-ss",
             ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("realsense2_camera"),
-                            "launch",
-                            "rs_launch.py",
-                        ]
-                    )
-                ),
-                launch_arguments={
-                    "namespace": "",
-                    "initial_reset": "false",
-                    "rgb_camera.color_profile": "640x480x30",
-                    "rgb_camera.enable_auto_exposure": "true",
-                    "enable_accel": "true",
-                    "enable_gyro": "true",
-                    "unite_imu_method": "2",
-                    "enable_depth": "false",
-                }.items(),
-                condition=IfCondition(
-                    PythonExpression(
-                        [
-                            "'",
-                            LaunchConfiguration("playback_bag"),
-                            "' == 'changeme'",
-                        ]
-                    )
-                ),
-            ),
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource(
+            #         PathJoinSubstitution(
+            #             [
+            #                 FindPackageShare("realsense2_camera"),
+            #                 "launch",
+            #                 "rs_launch.py",
+            #             ]
+            #         )
+            #     ),
+            #     launch_arguments={
+            #         "namespace": "",
+            #         "initial_reset": "false",
+            #         "rgb_camera.color_profile": "640x480x30",
+            #         "rgb_camera.enable_auto_exposure": "true",
+            #         "enable_accel": "true",
+            #         "enable_gyro": "true",
+            #         "unite_imu_method": "2",
+            #         "enable_depth": "false",
+            #     }.items(),
+            #     condition=IfCondition(
+            #         PythonExpression(
+            #             [
+            #                 "'",
+            #                 LaunchConfiguration("playback_bag"),
+            #                 "' == 'changeme'",
+            #             ]
+            #         )
+            #     ),
+            # ),
             Node(
                 package="orb_slam3_ros2",
                 executable="imu_mono_node_cpp",
