@@ -49,8 +49,7 @@ public:
   ImuMonoRealSense()
     : Node("imu_mono_realsense"),
       vocabulary_file_path(std::string(PROJECT_PATH) +
-                           "/ORB_SLAM3/Vocabulary/ORBvoc.txt"),
-      inertial_ba1_(false), inertial_ba2_(false)
+                           "/ORB_SLAM3/Vocabulary/ORBvoc.txt")
   {
 
     // declare parameters
@@ -311,7 +310,6 @@ private:
   void image_callback(const sensor_msgs::msg::Image::SharedPtr msg)
   {
     rclcpp::Time time_now = get_clock()->now();
-    RCLCPP_INFO_STREAM(get_logger(), "got image");
 
     // sensor_msgs::msg::Image::SharedPtr msg_out =
     //   std::make_shared<sensor_msgs::msg::Image>(*msg);
@@ -493,17 +491,17 @@ private:
       live_map_tf.child_frame_id = "live_map";
       tf_broadcaster->sendTransform(live_map_tf);
 
-      live_pcl_cloud_ = orb_slam3_system_->GetMapPCL();
+      // live_pcl_cloud_ = orb_slam3_system_->GetMapPCL();
 
-      pcl::PointCloud<pcl::PointXYZ>::Ptr live_ptr =
-        std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(live_pcl_cloud_);
-
-      pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZ>);
-      filtered_cloud_ptr = filter_point_cloud(live_ptr);
-
-      filtered_cloud_ptr->width = filtered_cloud_ptr->points.size();
-      pcl::toROSMsg(*filtered_cloud_ptr, live_pcl_cloud_msg_);
+      // pcl::PointCloud<pcl::PointXYZ>::Ptr live_ptr =
+      //   std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(live_pcl_cloud_);
+      //
+      // pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud_ptr(
+      //   new pcl::PointCloud<pcl::PointXYZ>);
+      // filtered_cloud_ptr = filter_point_cloud(live_ptr);
+      //
+      // filtered_cloud_ptr->width = filtered_cloud_ptr->points.size();
+      // pcl::toROSMsg(*filtered_cloud_ptr, live_pcl_cloud_msg_);
 
       // this can go
       // live_occupancy_grid_ =
@@ -512,9 +510,9 @@ private:
       // live_occupancy_grid_->header.frame_id = "live_map";
       // live_occupancy_grid_publisher_->publish(*live_occupancy_grid_);
 
-      live_pcl_cloud_msg_.header.stamp = time_now;
-      live_pcl_cloud_msg_.header.frame_id = "live_map";
-      live_point_cloud_publisher_->publish(live_pcl_cloud_msg_);
+      // live_pcl_cloud_msg_.header.stamp = time_now;
+      // live_pcl_cloud_msg_.header.frame_id = "live_map";
+      // live_point_cloud_publisher_->publish(live_pcl_cloud_msg_);
     } else {
       // RCLCPP_INFO_STREAM(get_logger(), "IMU not initialized");
       initialize_variables();
@@ -576,8 +574,6 @@ private:
   pcl::PointCloud<pcl::PointXYZ> live_pcl_cloud_;
   nav_msgs::msg::OccupancyGrid::SharedPtr live_occupancy_grid_;
 
-  bool inertial_ba1_;
-  bool inertial_ba2_;
   Sophus::SE3f Tcw_;
 
   cv::VideoWriter video_writer_;

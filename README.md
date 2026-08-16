@@ -1,7 +1,27 @@
-# THIS IS A WORK IN PROGRESS
-
-
 # ORB_SLAM3_ROS2
+
+## 20260816 Update
+Have finally spent some time working on this project. I have greatly improved
+the build and simplified things, and have also integrated docker into the project.
+
+Instead of relying on ros2 launch files to launch realsense nodes and ORB_SLAM3
+nodes, we now rely on docker. This makes things very easy:
+
+Make sure you have docker installed:
+https://docs.docker.com/engine/install/
+
+And then enter the following commands:
+```bash
+docker compose build
+docker compose up realsense orb_slam3
+```
+
+This should launch one docker container that grabs your realsense and starts
+publishing on the /camera/infra1/image_rect_raw topic and /camera/imu, and
+another docker container that launches ORB_SLAM3 in my custom ros2 node which
+subscribes to both topics and feeds them into ORB_SLAM3.
+
+## Intro
 Implementing ORB_SLAM3 in ROS 2 jazzy with some bonus features.
 
 This repository is meant for running ORB_SLAM3 in ROS 2 jazzy with a D435i Realsense
