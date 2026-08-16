@@ -1,3 +1,6 @@
 [submodule "ORB_SLAM3"]
 	path = ORB_SLAM3
 	url = https://github.com/gjcliff/ORB_SLAM3.git
+[submodule "ros2_realsense_d435i_camera_calibration"]
+	path = ros2_realsense_d435i_camera_calibration
+	url = https://github.com/gjcliff/ros2_realsense_d435i_camera_calibration.git

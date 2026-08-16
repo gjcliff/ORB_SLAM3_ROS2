@@ -1,8 +1,9 @@
+include: [./ros2_realsense_d435i_camera_calibration/docker-compose.yaml]
 services:
 
   base:
     build: 
-      context: docker/
+      context: .
       dockerfile: Dockerfile
       args:
         - USER_UID=1001
@@ -27,4 +28,3 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    command: ros2 run demo_nodes_cpp talker

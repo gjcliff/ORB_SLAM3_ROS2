@@ -1,26 +1,30 @@
 from datetime import datetime
 
-from launch import LaunchDescription
-from launch_ros.actions import Node
+from launch.actions import (
+    DeclareLaunchArgument,
+    ExecuteProcess,
+    IncludeLaunchDescription,
+)
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
+    Command,
     LaunchConfiguration,
     PathJoinSubstitution,
     PythonExpression,
-    Command,
 )
-from launch.conditions import IfCondition
+from launch_ros.actions import Node
 from launch_ros.descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.actions import (
-    DeclareLaunchArgument,
-    IncludeLaunchDescription,
-    ExecuteProcess,
-)
+
+from launch import LaunchDescription
 
 
 def generate_launch_description():
-    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # use the user's timezone
+    current_time = datetime.now(tz=datetime.now().astimezone().tzinfo).strftime(
+        "%Y-%m-%d_%H-%M-%S"
+    )
     bag_name = f"ORB_SLAM3_{current_time}"
     return LaunchDescription(
         [
@@ -124,9 +128,7 @@ def generate_launch_description():
                                     " ",
                                     PathJoinSubstitution(
                                         [
-                                            FindPackageShare(
-                                                "realsense2_description"
-                                            ),
+                                            FindPackageShare("realsense2_description"),
                                             "urdf",
                                             "test_d435i_camera.urdf.xacro",
                                         ]

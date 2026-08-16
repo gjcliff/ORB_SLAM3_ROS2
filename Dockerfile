@@ -1,7 +1,5 @@
 FROM ros:jazzy-ros-base
 
-WORKDIR /app
-
 ARG USER_UID=1000
 ARG USER_GID=1000
 ARG USERNAME=franka
@@ -18,8 +16,17 @@ RUN apt-get update && apt-get install -y \
     unzip \
     pybind11-dev \
     python3-pip \
+    libyaml-cpp-dev \
     ros-${ROS_DISTRO}-navigation2 \
+    ros-${ROS_DISTRO}-pcl-ros \
     ros-${ROS_DISTRO}-pcl-conversions \
+    ros-${ROS_DISTRO}-pangolin \
+    ros-${ROS_DISTRO}-cv-bridge \
+    ros-${ROS_DISTRO}-xacro \
+    ros-${ROS_DISTRO}-ament-cmake-python \
+    ros-${ROS_DISTRO}-librealsense2 \
+    ros-${ROS_DISTRO}-realsense2-camera \
+    ros-${ROS_DISTRO}-realsense2-description \
     libpcl-dev && \
     rm -rf /var/lib/apt/lists/*
 
@@ -32,19 +39,19 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 USER $USERNAME
 
-COPY ./* /ros2_ws/src/ORB_SLAM3_ROS2
+COPY --chown=$USERNAME:$USERNAME . /ros2_ws/src/ORB_SLAM3_ROS2/
 COPY --chown=$USERNAME:$USERNAME ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# COPY ./include /app/include
-# COPY ./src /app/src
-# COPY ./databases /app/databases
-# COPY ./models /app/models
-# COPY ./CMakeLists.txt /app/CMakeLists.txt
-# COPY ./entrypoint.sh /app/entrypoint.sh
+# -e: stop at first error
+WORKDIR /ros2_ws/src/ORB_SLAM3_ROS2/ORB_SLAM3
 
-RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash \
-    colcon build \
+RUN bash -e -c "source /opt/ros/jazzy/setup.bash && ./build.sh"
+
+WORKDIR /ros2_ws
+
+RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
+    colcon build && \
     source install/setup.bash"
 
 ENTRYPOINT ["/entrypoint.sh"]
