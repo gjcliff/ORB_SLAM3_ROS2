@@ -4,9 +4,9 @@
 # ORB_SLAM3_ROS2
 Implementing ORB_SLAM3 in ROS 2 jazzy with some bonus features.
 
-This repository is meant for running ORB_SLAM3 in ROS 2 humble with a D435i Realsense
-camera. If you're looking to run ORB_SLAM3 on a dataset using ROS 2, I suggest
-you look at other repositories.
+This repository is meant for running ORB_SLAM3 in ROS 2 jazzy with a D435i Realsense
+camera. If you're looking to run ORB_SLAM3 on a pre-existing dataset using ROS 2, I 
+suggest you look around for other repos.
 
 This project is only set up for monocular and imu-monocular modes in orb_slam3
 at the moment.
@@ -17,10 +17,6 @@ follow the instructions here:
 https://github.com/realsenseai/librealsense/blob/master/doc/distribution_linux.md
 
 and install:
-- librealsense2-dkms 
-- librealsense2-utils
-- librealsense2-dev
-
 ```bash
 sudo apt install librealsense2-dkms librealsense2-utils librealsense2-dev
 ```
@@ -36,18 +32,18 @@ rosdep install --from-paths src -y --ignore-src
 ```
 
 #### Setting up your workspace
-The first thing I will do is explain how I set up my ROS 2 workspace for this project.
-
 Make a directory for your ROS 2 workspace, then cd into it:
 ```sh
 mkdir -p ws/src/ && cd ws/src/
 ```
+
 inside the ```src``` directory, clone this repository and its submodules:
 ```sh
 git clone --recurse-submodules -b main https://github.com/gjcliff/ORB_SLAM3_ROS2.git
+
 ```
 #### Building ORB_SLAM3
-Next, we have to build orbslam3 and its dependencies.
+Next, we will build ORB_SLAM3 and its dependencies.
 
 You need to install ORB_SLAM3's dependencies first. Go to [their repo](https://github.com/UZ-SLAMLab/ORB_SLAM3) and follow
 their instructions
