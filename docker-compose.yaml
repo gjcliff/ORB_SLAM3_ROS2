@@ -1,0 +1,30 @@
+services:
+
+  base:
+    build: 
+      context: docker/
+      dockerfile: Dockerfile
+      args:
+        - USER_UID=1001
+        - USER_GID=1001
+        - USERNAME=${USERNAME}
+    network_mode: host
+    ipc: host
+    privileged: true
+    tty: true
+    init: true
+    stdin_open: true
+    environment:
+      QT_X11_NO_MITSHM: 1
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev:/dev
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ros2 run demo_nodes_cpp talker
