@@ -5,6 +5,8 @@ services:
     extends:
       service: base
     image: "orb_slam3:latest"
+    volumes:
+      - .:/ros2_ws/src/ORB_SLAM3_ROS2
     command: >
       bash -c "
       source /opt/ros/jazzy/setup.bash &&
