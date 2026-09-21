@@ -2,14 +2,15 @@ FROM ros:jazzy-ros-base
 
 ARG USER_UID=1000
 ARG USER_GID=1000
-ARG USERNAME=franka
-
+ARG USERNAME=user
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     ccache \
+    xterm \
+    gdb \
     ninja-build \
     git \
     g++ \
@@ -32,28 +33,29 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # create non-root user without sudo
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
-    && echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc \
-    && echo "source /ros2_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
+RUN userdel -r ubuntu 2>/dev/null || true \
+    && groupdel ubuntu 2>/dev/null || true \
+    && groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
 USER $USERNAME
 
-# COPY --chown=$USERNAME:$USERNAME . /ros2_ws/src/ORB_SLAM3_ROS2/
-COPY --chown=$USERNAME:$USERNAME ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chown=$USERNAME:$USERNAME ./ORB_SLAM3/ /ros2_ws/src/ORB_SLAM3_ROS2/ORB_SLAM3/
+WORKDIR /ros2_ws/src/ORB_SLAM3_ROS2/ORB_SLAM3
+RUN bash -e -c "source /opt/ros/jazzy/setup.bash && ./build.sh"
 
-# -e: stop at first error
-# WORKDIR /ros2_ws/src/ORB_SLAM3_ROS2/ORB_SLAM3
-#
-# RUN bash -e -c "source /opt/ros/jazzy/setup.bash && ./build.sh"
-#
 WORKDIR /ros2_ws
+COPY --chown=$USERNAME:$USERNAME ./CMakeLists.txt ./package.xml /ros2_ws/src/ORB_SLAM3_ROS2/
+COPY --chown=$USERNAME:$USERNAME ./src/ /ros2_ws/src/ORB_SLAM3_ROS2/src/
+COPY --chown=$USERNAME:$USERNAME ./launch/ /ros2_ws/src/ORB_SLAM3_ROS2/launch/
+COPY --chown=$USERNAME:$USERNAME ./config/ /ros2_ws/src/ORB_SLAM3_ROS2/config/
+COPY --chown=$USERNAME:$USERNAME ./clouds/ /ros2_ws/src/ORB_SLAM3_ROS2/clouds/
 
-# RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
-#     colcon build && \
-#     source install/setup.bash"
+RUN --mount=type=cache,target=/home/${USERNAME}/.ccache,uid=${USER_UID},gid=${USER_GID} \
+    . /opt/ros/jazzy/setup.sh \
+    && colcon build --cmake-args -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+COPY --chmod=755 ./entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD [ "/bin/bash" ]
+CMD ["/bin/bash"]

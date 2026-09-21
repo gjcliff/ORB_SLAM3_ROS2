@@ -7,22 +7,19 @@ services:
     image: "orb_slam3:latest"
     volumes:
       - .:/ros2_ws/src/ORB_SLAM3_ROS2
+      - ./videos:/ros2_ws/src/ORB_SLAM3_ROS2/videos
+      - ./bags:/ros2_ws/src/ORB_SLAM3_ROS2/bags
+      - ./outputs:/ros2_ws/src/ORB_SLAM3_ROS2/outputs
     command: >
-      bash -c "
-      source /opt/ros/jazzy/setup.bash &&
-      colcon build &&
-      source install/setup.bash &&
       ros2 launch orb_slam3_ros2 mapping.launch.py
-      "
-
 
   base:
     build: 
       context: .
       dockerfile: Dockerfile
       args:
-        - USER_UID=1001
-        - USER_GID=1001
+        - USER_UID=${USER_UID:-1000}
+        - USER_GID=${USER_GID:-1000}
         - USERNAME=${USERNAME}
     network_mode: host
     ipc: host

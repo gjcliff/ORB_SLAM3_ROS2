@@ -35,7 +35,6 @@ find_package(nav_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(realsense2_description REQUIRED)
 find_package(xacro REQUIRED)
-find_package(Sophus REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
@@ -154,24 +153,13 @@ install(
 )
 
 install(
-  DIRECTORY clouds/
-  DESTINATION share/${PROJECT_NAME}/clouds
-)
-
-install(
-  DIRECTORY database_outputs/
-  DESTINATION share/${PROJECT_NAME}/database_outputs
-)
-
-install(
-    DIRECTORY occupancy_grids/
-    DESTINATION share/${PROJECT_NAME}/occupancy_grids
-)
-
-# install launch files
-install(
   DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch
+)
+
+install(
+  DIRECTORY clouds/
+  DESTINATION share/${PROJECT_NAME}/clouds
 )
 
 if(BUILD_TESTING)

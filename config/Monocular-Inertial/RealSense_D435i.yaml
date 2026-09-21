@@ -19,19 +19,20 @@ loopClosing: 0
 # Camera1.cx: 326.22132726
 # Camera1.cy: 245.58281905
 
-Camera1.fx: 382.613
-Camera1.fy: 382.613
-Camera1.cx: 320.183
-Camera1.cy: 236.455
+Camera1.fx: 425.28419
+Camera1.fy: 429.65422
+Camera1.cx: 428.53729
+Camera1.cy: 240.89576
 
 # distortion parameters
-Camera1.k1: 0.0
-Camera1.k2: 0.0
-Camera1.p1: 0.0
-Camera1.p2: 0.0
+Camera1.k1: 0.038017
+Camera1.k2: -0.066614
+Camera1.p1: -0.000826
+Camera1.p2: -0.000878
+Camera1.k3: 0.038978
 
 # Camera resolution
-Camera.width: 640
+Camera.width: 848
 Camera.height: 480
 
 # Camera frames per second
